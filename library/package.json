@@ -1,0 +1,30 @@
+{
+  "name": "pcfutilities",
+  "version": "1.0.0",
+  "description": "a set of helpers",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --config=jest.config.js --runInBand",
+    "testwatch": "jest --config=jest.config.js --runInBand --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FlorianGrimm/PCFUtilities.git"
+  },
+  "author": "Florian Grimm",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/FlorianGrimm/PCFUtilities/issues"
+  },
+  "homepage": "https://github.com/FlorianGrimm/PCFUtilities#readme",
+  "devDependencies": {
+    "@types/jest": "^26.0.15",
+    "@types/powerapps-component-framework": "^1.2.0",
+    "canvas": "^2.5.0",
+    "espower-typescript": "^9.0.2",
+    "jest": "^26.6.3",
+    "power-assert": "^1.6.1",
+    "ts-jest": "^26.4.4",
+    "typescript": "^3.9.7"
+  }
+}
