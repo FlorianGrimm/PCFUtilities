@@ -2,8 +2,8 @@ import * as React from "react";
 // import type { ITriggerEvent, MultiTriggerEvent } from "./shared/triggerEvent";
 // import type { TriggerUpdateViewHost, TriggerUpdateViewProps } from './shared/triggerUpdateView';
 
-import { Unsubscripes } from "../../../PCFUtilities/src/sparedataflow";;
-import { wireTriggerUpdateView } from '../../../PCFUtilities/src/controlstate/triggerUpdateView';
+import { Unsubscripes } from "PCFUtilities/sparedataflow";
+import { wireTriggerUpdateView } from "PCFUtilities/controlstate/triggerUpdateView";
 
 import type { State } from './types';
 import GuidelinesControlViewLine from "./GuidelinesControlViewLine";

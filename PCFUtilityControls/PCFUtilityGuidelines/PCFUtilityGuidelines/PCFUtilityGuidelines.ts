@@ -3,11 +3,11 @@
 import React = require("react");
 import ReactDOM = require("react-dom");
 
-import { initPCFState, transferParameters, updateContextInit } from "../../../PCFUtilities/src/controlstate";
-import { ControlSize, PCFState } from "../../../PCFUtilities/src/controlstate/types";
-import { getControlAllocatedSize, isEqualControlSize } from "../../../PCFUtilities/src/controlstate/triggerSizeChanged";
-import { TriggerProperty, Unsubscripes } from "../../../PCFUtilities/src/sparedataflow";
-import { getLoggerService, ILogger, LogLevel } from "../../../PCFUtilities/src/logging";
+import { initPCFState, transferParameters, updateContextInit } from "PCFUtilities/controlstate";
+import { ControlSize, PCFState } from "PCFUtilities/controlstate/types";
+import { getControlAllocatedSize, isEqualControlSize } from "PCFUtilities/controlstate/triggerSizeChanged";
+import { TriggerProperty, Unsubscripes } from "PCFUtilities/sparedataflow";
+import { getLoggerService, ILogger, LogLevel } from "PCFUtilities/logging";
 import { IInputs, IOutputs } from "./generated/ManifestTypes";
 import type {  State } from "./types";
 import { GetOutputsState } from './GetOutputsState';
