@@ -54,19 +54,24 @@ export class MessagingService implements IMessagingService {
         };
         if ((this.options.enableTransportPostMessage === false) && (this.options.enableTransportPromise === false)) {
             this.options.enableTransportPostMessage = (this.options?.window?.postMessage) ? true : false;
-            this.options.enableTransportPromise = this.options.enableTransportPostMessage ? false : true;
-        }
-        if (this.options.enableTransportPostMessage) {
-            this.options.enableTransportPromise = false;
+        } else if (this.options.enableTransportPostMessage){
+            if (this.options?.window?.postMessage) {
+                // OK
+            } else {
+                // no postMessage on nodejs
+                this.options.enableTransportPostMessage=false;
+            }
         }
         if (this.options.enableTransportPostMessage) {
             this.windowOnReceiveMessage = this.windowOnReceiveMessage.bind(this);
             this.options.window?.addEventListener("message", this.windowOnReceiveMessage);
-        } else if (this.options.enableTransportPromise) {
+        } 
+        if (this.options.enableTransportPromise) {
             getLocalMessagingServices().services.push(createWeakRef(this));
         }
     }
-    windowOnReceiveMessage = (ev: MessageEvent<any>) => {
+
+    windowOnReceiveMessage = (ev: MessageEvent) => {
         this.onReceiveMessage(ev.data);
     }
 
@@ -111,20 +116,21 @@ export class MessagingService implements IMessagingService {
                 return result;
             }).then((p:Promise<any>[])=>{
                 if (p && p.length>0){
-                    return Promise.all(p).then(()=>"all");
+                    return Promise.all(p).then(()=>"promises awaited");
                 } else {
-                    return Promise.resolve("none");
+                    return Promise.resolve("no promises");
                 }
             });
         }
-        throw new Error("no enabled protocol");
+        throw new Error("no enabled protocol for sendMessage");
     }
 
     dispose(): void {
         if (this.options.enableTransportPostMessage) {
             this.options.window?.removeEventListener("message", this.windowOnReceiveMessage);
             this.options.enableTransportPostMessage = false
-        } else if (this.options.enableTransportPromise) {
+        } 
+        if (this.options.enableTransportPromise) {
             this.options.enableTransportPromise = false;
             const services = getLocalMessagingServices().services;
             let idx = 0;

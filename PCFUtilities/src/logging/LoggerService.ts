@@ -1,5 +1,5 @@
 import type { ILogger, ILoggerService, ILogggerTarget } from "./types";
-import { LogLevel } from "./LogLevel";
+import { LogLevel, convertTextToLogLevel } from "./LogLevel";
 import { Logger } from "./Logger";
 import { LogTargetConsole } from "./LogTargetConsole";
 
@@ -46,6 +46,9 @@ export class LoggerService implements ILoggerService {
     setLogLevel(source: string, level: LogLevel): void {
         this._loggerConfiguration.set(source, level);
     }
+    setLogLevelFromString(source: string, level: LogLevel | string | null | undefined):void{
+        this.setLogLevel(source, convertTextToLogLevel(level, LogLevel.debug));
+    }
 
     setConfiguration(cfgAsText: string, loggerService: ILoggerService) {
         if (cfgAsText) {
@@ -70,12 +73,12 @@ export class LoggerService implements ILoggerService {
     }
 
     log(level: LogLevel, source: string, message?: any, ...optionalParams: any[]) {
-        const levelSource = this._loggerConfiguration.get(source) ?? LogLevel.warn;
+        const levelSource = this._loggerConfiguration.get(source) ?? this._loggerConfiguration.get("default") ?? LogLevel.info;
         if (level >= levelSource) {
             if (this._targets) {
                 this._targets.map((t) => {
                     try {
-                        t.log(length, source, message, ...optionalParams);
+                        t.log(level, source, message, ...optionalParams);
                     } catch (error) {
                         console.error && console.error(error);
                     }

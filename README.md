@@ -37,6 +37,11 @@ cd PCFUtilityDatasetSample
 pac pcf init --namespace PCFUtilitySample --name  PCFUtilityDatasetSample --template dataset
 npm install
 
+mkdir PCFUtilityGuidelines
+cd  PCFUtilityGuidelines
+pac pcf init --namespace PCFUtility --name  PCFUtilityGuidelines --template field
+npm install
+
 mkdir library
 cd library
 npm install typescript@^3.9.7 @types/powerapps-component-framework@^1.2.0 --save-dev
