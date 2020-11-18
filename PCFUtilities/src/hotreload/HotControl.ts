@@ -11,27 +11,53 @@ export class HotControl<IInputs = any, IOutputs = any> implements ComponentFrame
         state?: ComponentFramework.Dictionary;
         container?: HTMLDivElement;
     };
-    instance: HotReloadHost<IInputs, IOutputs> | null;
-    hotRepositoryForType: HotRepositoryForType;
+    private _instance: HotReloadHost<IInputs, IOutputs> | null;
+    hotRepositoryForType: HotRepositoryForType | null;
+    logger: ILogger|null;
+    
     getOutputs?: () => IOutputs;
-    logger:ILogger;
+    hotReload?: (context: ComponentFramework.Context<IInputs>, notifyOutputChanged?: () => void, state?: ComponentFramework.Dictionary, container?: HTMLDivElement, hotReloadState?: any) => void;
+    getHotReloadState?: () => any;
 
     constructor(
         instance: HotReloadHost<IInputs, IOutputs>,
         hotRepositoryForType: HotRepositoryForType,
-        logger:ILogger) {
+        logger: ILogger
+        ) {
         this.info = {};
-        this.instance = instance;
+        this._instance = null;
+        this.hotRepositoryForType = null;
+        this.logger = null;
         this.hotRepositoryForType = hotRepositoryForType;
         this.logger = logger;
-
-        if (typeof instance?.getOutputs === "function") {
+        this.instance = instance;
+    }
+    
+    get instance(): HotReloadHost<IInputs, IOutputs> | null {
+        return this._instance;
+    }
+    set instance(value: HotReloadHost<IInputs, IOutputs> | null) {
+        this._instance = value;
+        if (typeof value?.getOutputs === "function") {
             this.getOutputs = () => {
                 return this.instance!.getOutputs!();
             }
+        } else {
+            this.getOutputs = undefined;
+        }
+        if ((typeof value?.getHotReloadState === "function") && (typeof value?.hotReload === "function")) {
+            this.hotReload = (context: ComponentFramework.Context<IInputs>, notifyOutputChanged?: () => void, state?: ComponentFramework.Dictionary, container?: HTMLDivElement, hotReloadState?: any) => {
+                this.info = { context, notifyOutputChanged, state, container };
+                return this.instance!.hotReload!(context, notifyOutputChanged, state, container, hotReloadState);
+            }
+            this.getHotReloadState = () => {
+                return this.instance!.getHotReloadState!();
+            }
+        } else {
+            this.hotReload = undefined;
+            this.getHotReloadState = undefined;
         }
     }
-
     isValid() { return this.instance !== null; }
 
     /**
@@ -66,7 +92,44 @@ export class HotControl<IInputs = any, IOutputs = any> implements ComponentFrame
         this.info = {};
         getHotRepository().removeHotControl(this);
     }
-
+    notificationHotReload(fetchedUrl: string) {
+        const url = this.hotRepositoryForType?.hotRepositoryForUrl.url;
+        const container = this.info.container;
+        this.logger?.debug("notificationHotReload", fetchedUrl, url);
+        if (container && fetchedUrl === url) {
+            container.style.border = "1px solid yellow";
+            return;
+        }
+    }
+    notificationHotReloaded(fetchedUrl: string) {
+        const url = this.hotRepositoryForType?.hotRepositoryForUrl.url;
+        const container = this.info.container;
+        this.logger?.debug("notificationHotReloaded", fetchedUrl, url);
+        if (container && fetchedUrl === url) {
+            container.style.border = "1px solid red";
+            try {
+                const instance = this.instance;
+                if (instance && (typeof instance.hotReload === "function")) {
+                    const typeLatest = this.hotRepositoryForType?.type;
+                    const type: HotReloadHostConstructor<IInputs, IOutputs> = (this.instance as any).constructor;
+                    const { context, notifyOutputChanged, state } = this.info;
+                    if (type && typeLatest && type !== typeLatest && context) {
+                        const hotReloadState = instance.getHotReloadState && instance.getHotReloadState();
+                        const nextInstance = new typeLatest();
+                        if (typeof nextInstance.hotReload === "function") {
+                            instance.destroy();
+                            this.instance = nextInstance;
+                            nextInstance.hotReload(context, notifyOutputChanged, state, container, hotReloadState);
+                            container.style.border = "";
+                        }
+                    }
+                }
+            } catch (error) {
+                this.logger?.error("hot reload failed", error);
+            }
+        }
+    }
+    /*
     notification(
         arg: { event: "hotReload"; url: string; }
             | { event: "hotReloaded"; url: string; }
@@ -92,6 +155,7 @@ export class HotControl<IInputs = any, IOutputs = any> implements ComponentFrame
                         if (typeof nextInstance.hotReload === "function"){
                             this.destroy();
                             
+                            this.hotRepositoryForType.getWrappedType()
                             const hotControl = new HotControl(nextInstance, this.hotRepositoryForType, this.logger);
                             getHotRepository().addHotControl(hotControl);
                             nextInstance.hotReload(context, notifyOutputChanged, state, container, hotReloadState);
@@ -104,4 +168,5 @@ export class HotControl<IInputs = any, IOutputs = any> implements ComponentFrame
             }
         }
     }
+    */
 }

@@ -16,7 +16,7 @@ import { calcFormula, parseFormula } from "./formula";
 
 export class PCFUtilityGuidelines implements ComponentFramework.StandardControl<IInputs, IOutputs> {
 	static namespace = "PCFUtility";
-	static version = 10005;
+	static version = 10006;
 	pcfState: PCFState<IInputs, IOutputs>;
 	state: State;
 	unsubscripes: Unsubscripes;
@@ -238,11 +238,11 @@ export class PCFUtilityGuidelines implements ComponentFramework.StandardControl<
 			const state = this.state;
 			const ucs = updateContextInit(context, mode, {});
 
-			this.logger.info("ucs", ucs);
+			this.logger.info("updateContextInit ucs:", ucs, mode);
 			if (ucs.isInit || ucs.isReload) {
 				context.mode.trackContainerResize(true);
 			}
-			state.isAuthoringMode.value = (context.mode.isAuthoringMode || false);
+			state.isAuthoringMode.value = (context.mode.isAuthoringMode ?? true);
 			state.allocatedSize.value = getControlAllocatedSize(context);
 
 			if (ucs.isInit || ucs.isReload || ucs.parametersChanged || ucs.layoutChanged || ucs.noUpdatedProperties) {

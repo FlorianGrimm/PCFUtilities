@@ -37,12 +37,14 @@ export class HotRepository {
         return result;
     }
 
+    // main entry
     enableHotReloadForTypes<Types extends HotReloadHostConstructorDictionary>(
         url: string,
         types: Types,
         moduleExports: Types
     ) {
         try {
+            this.logger.warn("enableHotReloadForTypes is activated:", url, types);
             const hotRepositoryForUrl = this.registerTypes(url, types);
             hotRepositoryForUrl.enableHotReloadForTypes(types, moduleExports);
         } catch (err) {

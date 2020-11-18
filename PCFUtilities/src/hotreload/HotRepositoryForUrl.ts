@@ -119,13 +119,14 @@ export class HotRepositoryForUrl {
         }
     }
     fetchAndApply() {
-        getHotRepository().foreachHotControl((hotControl) => { hotControl.notification({ event: "hotReload", url: this.url }) });
+        getHotRepository().foreachHotControl((hotControl) => { 
+            hotControl.notificationHotReload(this.url); 
+        });
         this.fetchBundle().then((jsData) => {
             this.logger.debug('hot reload bundle fetched.');
             if (this.evaluateBundleHotReload(jsData)) {
                 getHotRepository().foreachHotControl((hotControl) => {
-                    this.logger.debug("hotReloaded");
-                    hotControl.notification({ event: "hotReloaded", url: this.url }) 
+                    hotControl.notificationHotReloaded(this.url);
                 });
             }
         });

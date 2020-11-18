@@ -1,9 +1,10 @@
 import { HotReloadHostConstructorDictionary } from "./types";
 import { keyLocalStoragePrefix } from "./consts";
 import { getHotRepository } from "./HotRepository";
-import type { ILoggerService } from "../logging";
+import { ILoggerService, LogLevel } from "../logging";
 
 export function enableHotReloadForTypes<Types extends HotReloadHostConstructorDictionary>(
+    isHotReloadAllowed: boolean,
     name: string,
     types: Types,
     moduleExports: any,
@@ -17,13 +18,18 @@ export function enableHotReloadForTypes<Types extends HotReloadHostConstructorDi
     window.localStorage.setItem("HotReload#GuidelinesControl#Url", "http://127.0.0.1:8181/bundle.js");
     */
     
-    const isEnabled = window.localStorage.getItem(keyEnabled) === "On";
+    const isEnabled = (isHotReloadAllowed) ? (window.localStorage.getItem(keyEnabled) === "On") : false;
     const url = (isEnabled) ? window.localStorage.getItem(keyUrl) : null;
+        
+    if (isEnabled){
+        console.info("hotreload config", "keyEnabled", keyEnabled , isEnabled, "keyUrl", keyUrl , url);
+    }
     if (isEnabled && url) {
         if (!configure){
             configure = (loggerService: ILoggerService)=>{
                 const keyLogger = `${keyLocalStoragePrefix}#${name}#Logger`;
-                loggerService.setLogLevelFromString(name, window.localStorage.getItem(keyLogger));
+                const logLevel = window.localStorage.getItem(keyLogger);
+                loggerService.setLogLevelFromString(name, logLevel ?? LogLevel.debug);
             }
         } 
         getHotRepository(name, configure).enableHotReloadForTypes(url, types, moduleExports);

@@ -20,6 +20,7 @@ npm run start watch
 // development enable HotReload
 import { enableHotReloadForTypes } from '../../../PCFUtilities/src/hotreload';
 enableHotReloadForTypes(
+	true,
 	"PCFUtilityGuidelines",
 	control,
 	exports
