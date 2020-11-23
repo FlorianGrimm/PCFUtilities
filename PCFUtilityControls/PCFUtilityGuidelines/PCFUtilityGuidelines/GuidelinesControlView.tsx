@@ -2,7 +2,7 @@ import * as React from "react";
 // import type { ITriggerEvent, MultiTriggerEvent } from "./shared/triggerEvent";
 // import type { TriggerUpdateViewHost, TriggerUpdateViewProps } from './shared/triggerUpdateView';
 
-import { Unsubscripes } from "PCFUtilities/sparedataflow";
+import { DisposeCollection } from "PCFUtilities/sparedataflow";
 import { wireTriggerUpdateView } from "PCFUtilities/controlstate/triggerUpdateView";
 
 import type { State } from './types';
@@ -18,13 +18,13 @@ export type GuidelinesControlViewState = {
 
 export default class GuidelinesControlView extends React.Component<GuidelinesControlViewProps, GuidelinesControlViewState> {
     tickUpdateView: number;
-    unsubscripes: Unsubscripes;
+    disposables: DisposeCollection;
     constructor(props: GuidelinesControlViewProps) {
         super(props);
         this.tickUpdateView = 1;
         this.state = { tickUpdateView: 1 };
-        this.unsubscripes = new Unsubscripes();
-        this.unsubscripes.add(wireTriggerUpdateView(this, props));
+        this.disposables = new DisposeCollection();
+        this.disposables.add(wireTriggerUpdateView(this, props));
     }
 
     render() {
@@ -54,6 +54,6 @@ export default class GuidelinesControlView extends React.Component<GuidelinesCon
         }
     }
     componentWillUnmount() {
-        this.unsubscripes.unsubscripe();
+        this.disposables.dispose();
     }
 }

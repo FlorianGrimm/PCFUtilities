@@ -6,7 +6,7 @@ import ReactDOM = require("react-dom");
 import { initPCFState, transferParameters, updateContextInit } from "PCFUtilities/controlstate";
 import { ControlSize, PCFState } from "PCFUtilities/controlstate/types";
 import { getControlAllocatedSize, isEqualControlSize } from "PCFUtilities/controlstate/triggerSizeChanged";
-import { TriggerProperty, Unsubscripes } from "PCFUtilities/sparedataflow";
+import { TriggerProperty, DisposeCollection } from "PCFUtilities/sparedataflow";
 import { getLoggerService, ILogger, LogLevel } from "PCFUtilities/logging";
 import { IInputs, IOutputs } from "./generated/ManifestTypes";
 import type {  State } from "./types";
@@ -19,14 +19,14 @@ export class PCFUtilityGuidelines implements ComponentFramework.StandardControl<
 	static version = 10006;
 	pcfState: PCFState<IInputs, IOutputs>;
 	state: State;
-	unsubscripes: Unsubscripes;
+	disposables: DisposeCollection;
 	logger: ILogger;
 
 	/**
 	 * Empty constructor.
 	 */
 	constructor() {
-		getLoggerService().setLogLevel("PCFUtilityGuidelines", LogLevel.info);
+		getLoggerService().setLogLevel("PCFUtilityGuidelines", LogLevel.warn);
 		this.logger = getLoggerService().createLogger("PCFUtilityGuidelines");
 		this.pcfState = {
 			notifyOutputChanged: null,
@@ -34,7 +34,7 @@ export class PCFUtilityGuidelines implements ComponentFramework.StandardControl<
 			container: null,
 			context: null
 		};
-		this.unsubscripes = new Unsubscripes();
+		this.disposables = new DisposeCollection();
 		this.state = {
 			isAuthoringMode: new TriggerProperty<boolean>("isAuthoringMode", false, undefined, this.logger),
 			allocatedSize: new TriggerProperty<ControlSize>("controlSize", { width: undefined, height: undefined }, isEqualControlSize, this.logger),
@@ -92,9 +92,9 @@ export class PCFUtilityGuidelines implements ComponentFramework.StandardControl<
 		};
 
 		// isAuthoringMode changes the view
-		this.unsubscripes.add(
+		this.disposables.add(
 			this.state.isAuthoringMode
-				.subscripe(setUpdateView));
+				.subscribe(setUpdateView));
 
 		// // controlSize changes the view
 		// this.unsubscripes.add(
@@ -112,7 +112,7 @@ export class PCFUtilityGuidelines implements ComponentFramework.StandardControl<
 			this.state.fxProps.FxX1, this.state.fxProps.FxX2, this.state.fxProps.FxX3, this.state.fxProps.FxX4, this.state.fxProps.FxX5,
 			this.state.fxProps.FxY1, this.state.fxProps.FxY2, this.state.fxProps.FxY3, this.state.fxProps.FxY4, this.state.fxProps.FxY5
 		].forEach((tp) => {
-			this.unsubscripes.add(tp.subscripe(setCalcNeeded));
+			this.disposables.add(tp.subscribe(setCalcNeeded));
 		});
 
 		const setUpdateOutput = (evt: any, sender: any) => {
@@ -127,18 +127,18 @@ export class PCFUtilityGuidelines implements ComponentFramework.StandardControl<
 			this.state.resultProps.X4, this.state.resultProps.W4, this.state.resultProps.Y4, this.state.resultProps.H4,
 			this.state.resultProps.X5, this.state.resultProps.W5, this.state.resultProps.Y5, this.state.resultProps.H5,
 		].forEach((tp) => {
-			this.unsubscripes.add(tp.subscripe(setUpdateOutput));
+			this.disposables.add(tp.subscribe(setUpdateOutput));
 		});
-		this.unsubscripes.add(
-			this.state.triggerOutputs.subscripe(() => {
+		this.disposables.add(
+			this.state.triggerOutputs.subscribe(() => {
 				if (this.state.triggerOutputs.value) {
 					if (this.state.triggerGetOutputs.value == GetOutputsState.Silent){
 						this.state.triggerGetOutputs.value = GetOutputsState.Trigger;
 					}
 				}
 			}));
-		this.unsubscripes.add(
-			this.state.triggerGetOutputs.subscripe((value:GetOutputsState)=>{
+		this.disposables.add(
+			this.state.triggerGetOutputs.subscribe((value:GetOutputsState)=>{
 				if (this.state.triggerGetOutputs.value == GetOutputsState.Silent){
 					this.state.triggerOutputs.value=false;
 					return;
@@ -209,7 +209,7 @@ export class PCFUtilityGuidelines implements ComponentFramework.StandardControl<
 	 * i.e. cancelling any pending remote calls, removing listeners, etc.
 	 */
 	public destroy(): void {
-		this.unsubscripes.unsubscripe();
+		this.disposables.dispose();
 		const container = this.pcfState.container;
 		if (container) {
 			this.pcfState.container = null;

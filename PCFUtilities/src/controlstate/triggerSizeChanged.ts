@@ -1,4 +1,4 @@
-import type { ITriggerEvent, Unsubscripe } from "../sparedataflow";
+import type { ITriggerEvent, Unsubscribe } from "../sparedataflow";
 import type { ControlSize } from "./types";
 
 
@@ -43,14 +43,14 @@ debugger;
 export function wireTriggerUpdateSize<P extends TriggerUpdateControlSizeProps, S extends TriggerUpdateControlSizeState>(
     that: TriggerUpdateControlSizeReactComponent<P, S>,
     props: TriggerUpdateControlSizeProps
-): Unsubscripe {
+): Unsubscribe {
     const triggerUpdateSize = (sender: any, controlSize: ControlSize) => {
         const r = calcControlSize(that.state.controlSize, controlSize);
         if (!r[0]) {
             that.setState({ controlSize: r[1] });
         }
     };
-    return props.getTriggers().triggerUpdateSize.subscripe(triggerUpdateSize);
+    return props.getTriggers().triggerUpdateSize.subscribe(triggerUpdateSize);
 }
 
 export function getControlAllocatedSize<IInputs = any>(context: ComponentFramework.Context<IInputs>): ControlSize {

@@ -1,8 +1,8 @@
 import type { ILogger } from "../logging";
 
-import type { CallbackHandler, ITriggerEvent, Resume, Unsubscripe } from "./types";
+import type { CallbackHandler, ITriggerEvent, Resume, Unsubscribe } from "./types";
 
-function unsubscripeEmpty() { return; }
+function unsubscribeEmpty() { return; }
 
 export class TriggerEvent<E = any> implements ITriggerEvent<E> {
     name: string;
@@ -19,16 +19,16 @@ export class TriggerEvent<E = any> implements ITriggerEvent<E> {
         this.logger = logger || null;
     }
 
-    subscripe(cbh: CallbackHandler<E>): Unsubscripe {
+    subscribe(cbh: CallbackHandler<E>): Unsubscribe {
         if (cbh) {
             this.cbhs.push(cbh);
-            return () => { this.unsubscripe(cbh);  }
+            return () => { this.unsubscribe(cbh);  }
         } else {
-            return unsubscripeEmpty;
+            return unsubscribeEmpty;
         }
     }
 
-    unsubscripe(cbh: CallbackHandler<E>): void {
+    unsubscribe(cbh: CallbackHandler<E>): void {
         const idx = this.cbhs.indexOf(cbh);
         if (0<=idx){
             this.cbhs.splice(idx, 1);
@@ -63,7 +63,7 @@ export class TriggerEvent<E = any> implements ITriggerEvent<E> {
         }
     }
 
-    clear() {
+    dispose() {
         if (0 < this.cbhs.length) {
             this.cbhs.splice(0, this.cbhs.length)
         }

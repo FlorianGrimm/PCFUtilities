@@ -1,5 +1,7 @@
 import type * as React from "react";
-import type { ITriggerEvent, Unsubscripe, TriggerProperty } from "../sparedataflow";
+//import React = require("react");
+
+import type { ITriggerEvent, Unsubscribe, TriggerProperty } from "../sparedataflow";
 
 export type StateTriggerUpdateViewHost = {
     triggerUpdateView: TriggerProperty<boolean>;
@@ -21,7 +23,7 @@ export type TriggerUpdateViewReactComponent<P extends TriggerUpdateViewProps, S 
 export function wireTriggerUpdateView<P extends TriggerUpdateViewProps, S extends TriggerUpdateViewState>(
     that: TriggerUpdateViewReactComponent<P, S>,
     props: TriggerUpdateViewProps
-): Unsubscripe {
+): Unsubscribe {
     const triggerUpdateView = props.getState().triggerUpdateView;
     const updateView = () => {
         console.info("updateView", triggerUpdateView.value, that.state.tickUpdateView == that.tickUpdateView);
@@ -32,5 +34,5 @@ export function wireTriggerUpdateView<P extends TriggerUpdateViewProps, S extend
             that.setState({ tickUpdateView: nextTick });
         }
     };
-    return props.getState().triggerUpdateView.subscripe(updateView);
+    return props.getState().triggerUpdateView.subscribe(updateView);
 } 

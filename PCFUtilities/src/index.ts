@@ -43,11 +43,12 @@ export {
 } from './messaging';
 
 export {
-    ITriggerEvent, CallbackHandler, Unsubscripe, Resume,
+    ITriggerEvent, CallbackHandler, Unsubscribe, Resume,
 } from './sparedataflow/types';
 
 export {
     TriggerEvent,
-    TriggerProperty 
+    TriggerProperty,
+    DisposeCollection
 } from './sparedataflow';
 //

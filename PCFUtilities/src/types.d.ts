@@ -23,7 +23,7 @@ export {
 } from './messaging/types';
 
 export {
-    ITriggerEvent, CallbackHandler, Unsubscripe, Resume,
+    ITriggerEvent, CallbackHandler, Unsubscribe, Resume,
     TriggerEvent,
     TriggerProperty
 } from './sparedataflow/types';

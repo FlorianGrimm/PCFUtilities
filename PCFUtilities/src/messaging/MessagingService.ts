@@ -42,7 +42,7 @@ export class MessagingService implements IMessagingService {
     options: MessagingServiceOptions;
 
     constructor(options: Partial<MessagingServiceOptions>) {
-        if ((options as unknown) === undefined || (options as unknown) === null){options={};}
+        if ((options as unknown) === undefined || (options as unknown) === null) { options = {}; }
         this.options = {
             enableTransportPostMessage: (options.enableTransportPostMessage === true) ? true : false,
             enableTransportPromise: (options.enableTransportPromise === true) ? true : false,
@@ -52,20 +52,28 @@ export class MessagingService implements IMessagingService {
             window: (options.window?.postMessage) ? options.window : null,
             logger: options.logger || console || null
         };
-        if ((this.options.enableTransportPostMessage === false) && (this.options.enableTransportPromise === false)) {
-            this.options.enableTransportPostMessage = (this.options?.window?.postMessage) ? true : false;
-        } else if (this.options.enableTransportPostMessage){
-            if (this.options?.window?.postMessage) {
-                // OK
-            } else {
+        //
+        const transportPostMessagePossible = (this.options?.window?.postMessage) ? true : false;
+        if (this.options.enableTransportPostMessage) {
+            if (!transportPostMessagePossible) {
                 // no postMessage on nodejs
-                this.options.enableTransportPostMessage=false;
+                this.options.enableTransportPostMessage = false;
             }
         }
+        if ((this.options.enableTransportPostMessage === false) && (this.options.enableTransportPromise === false)) {
+            if (transportPostMessagePossible) {
+                this.options.enableTransportPostMessage = true;
+                this.options.enableTransportPromise = false;
+            } else {
+                this.options.enableTransportPromise = true;
+                this.options.enableTransportPostMessage = false;
+            }
+        } 
+        //
         if (this.options.enableTransportPostMessage) {
             this.windowOnReceiveMessage = this.windowOnReceiveMessage.bind(this);
             this.options.window?.addEventListener("message", this.windowOnReceiveMessage);
-        } 
+        }
         if (this.options.enableTransportPromise) {
             getLocalMessagingServices().services.push(createWeakRef(this));
         }
@@ -76,7 +84,7 @@ export class MessagingService implements IMessagingService {
     }
 
     onReceiveMessage<T extends Message>(message: T): void | Promise<any> {
-        if (typeof message.action === "string" 
+        if (typeof message.action === "string"
             && message.action
             && this.options.onReceiveMessage) {
             try {
@@ -84,11 +92,11 @@ export class MessagingService implements IMessagingService {
             } catch (error) {
                 this.options.logger.error("while receiving message", error);
             }
-        } 
+        }
         return;
     }
 
-    sendMessage(message: Message): Promise<any>{
+    sendMessage(message: Message): Promise<any> {
         if (this.options.enableTransportPostMessage) {
             const targetOrigin = (window?.postMessage)
                 ? ((typeof message.targetOrigin === "string")) ? message.targetOrigin : this.options.targetOrigin
@@ -98,14 +106,14 @@ export class MessagingService implements IMessagingService {
         }
         if (this.options.enableTransportPromise) {
             return Promise.resolve(message).then((msg) => {
-                const result:Promise<any>[]=[];
+                const result: Promise<any>[] = [];
                 const services = getLocalMessagingServices().services;
-                services.forEach((weakService)=>{
+                services.forEach((weakService) => {
                     try {
-                        const service=weakService.deref()
-                        if (service){
+                        const service = weakService.deref()
+                        if (service) {
                             const r = service.onReceiveMessage(message);
-                            if (r && typeof r.then === "function"){
+                            if (r && typeof r.then === "function") {
                                 result.push(r);
                             }
                         }
@@ -114,9 +122,9 @@ export class MessagingService implements IMessagingService {
                     }
                 });
                 return result;
-            }).then((p:Promise<any>[])=>{
-                if (p && p.length>0){
-                    return Promise.all(p).then(()=>"promises awaited");
+            }).then((p: Promise<any>[]) => {
+                if (p && p.length > 0) {
+                    return Promise.all(p).then(() => "promises awaited");
                 } else {
                     return Promise.resolve("no promises");
                 }
@@ -129,7 +137,7 @@ export class MessagingService implements IMessagingService {
         if (this.options.enableTransportPostMessage) {
             this.options.window?.removeEventListener("message", this.windowOnReceiveMessage);
             this.options.enableTransportPostMessage = false
-        } 
+        }
         if (this.options.enableTransportPromise) {
             this.options.enableTransportPromise = false;
             const services = getLocalMessagingServices().services;

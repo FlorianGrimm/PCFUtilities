@@ -1,11 +1,11 @@
-import { ITriggerEvent, CallbackHandler, Unsubscripe, Resume } from './types';
+import { ITriggerEvent, CallbackHandler, Unsubscribe, Resume } from './types';
 import { TriggerEvent } from './TriggerEvent';
 import { TriggerProperty } from './TriggerProperty';
-import { Unsubscripes } from './Unsubscripes';
+import { DisposeCollection } from './DisposeCollection';
 
 export {
-    ITriggerEvent, CallbackHandler, Unsubscripe, Resume,
+    ITriggerEvent, CallbackHandler, Unsubscribe, Resume,
     TriggerEvent,
     TriggerProperty,
-    Unsubscripes
+    DisposeCollection
 }

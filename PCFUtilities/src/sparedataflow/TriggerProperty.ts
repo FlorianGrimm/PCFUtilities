@@ -1,8 +1,8 @@
 import type { ILogger } from "../logging";
 
-import type { CallbackHandler, ITriggerEvent, Resume, Unsubscripe } from "./types";
+import type { CallbackHandler, ITriggerEvent, Resume, Unsubscribe } from "./types";
 
-function unsubscripeEmpty() { return; }
+function unsubscribeEmpty() { return; }
 
 export class TriggerProperty<T = any> implements ITriggerEvent<T> {
     name: string;
@@ -68,16 +68,16 @@ export class TriggerProperty<T = any> implements ITriggerEvent<T> {
         return this.value;
     }
 
-    subscripe(cbh: CallbackHandler<T>): Unsubscripe {
+    subscribe(cbh: CallbackHandler<T>): Unsubscribe {
         if (cbh) {
             this.cbhs.push(cbh);
-            return () => { this.unsubscripe(cbh); }
+            return () => { this.unsubscribe(cbh); }
         } else {
-            return unsubscripeEmpty;
+            return unsubscribeEmpty;
         }
     }
 
-    unsubscripe(cbh: CallbackHandler<T>): void {
+    unsubscribe(cbh: CallbackHandler<T>): void {
         const idx = this.cbhs.indexOf(cbh);
         this.cbhs.splice(idx, 1);
     }
@@ -141,13 +141,28 @@ export class TriggerProperty<T = any> implements ITriggerEvent<T> {
         }
     }
 
-    clear() {
+    dispose() {
         if (0 < this.cbhs.length) {
             this.cbhs.splice(0, this.cbhs.length)
         }
     }
 
     pause(): Resume {
+        this.isPaused++;
+        return () => {
+            this.isPaused--;
+            if (this.isPaused == 0) {
+                if (this.isTriggerPending) {
+                    this.logger?.info("resume triggers", this.name);
+                    this.internalTrigger(this, this.value);
+                } else {
+                    // this.logger?.info("resume silence", this.name);
+                }
+            }
+        };
+    }
+
+    x():Resume{
         this.isPaused++;
         return () => {
             this.isPaused--;

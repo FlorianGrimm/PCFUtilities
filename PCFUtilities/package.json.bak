@@ -4,8 +4,6 @@
   "description": "a set of helpers",
   "main": "index.js",
   "scripts": {
-    "watch": "tsc --watch",
-    "build": "tsc",
     "test": "jest --config=jest.config.js --runInBand",
     "testwatch": "jest --config=jest.config.js --runInBand --watch"
   },
@@ -21,7 +19,7 @@
   "homepage": "https://github.com/FlorianGrimm/PCFUtilities#readme",
   "devDependencies": {
     "@types/jest": "^26.0.15",
-    "@types/powerapps-component-framework": "^1.2.3",
+    "@types/powerapps-component-framework": "^1.2.0",
     "@types/react": "^16.9.56",
     "canvas": "^2.5.0",
     "espower-typescript": "^9.0.2",

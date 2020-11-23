@@ -5,18 +5,21 @@ window.addEventListener("message",
 */
 import type {ILogger} from '../logging/types';
 
+export type OnReceiveMessage<TMessage extends Message=Message>
+    = (message: TMessage)=>void | Promise<any>;
+
 export type MessagingServiceOptions={
     targetOrigin: string;
     enableTransportPostMessage: boolean;
     enableTransportPromise: boolean;
     onVerify: ()=>boolean;
-    onReceiveMessage: (message: Message)=>void | Promise<any>;
+    onReceiveMessage: OnReceiveMessage<any>;
     window:Window|null;
     logger:ILogger;
 }
 
 export interface IMessagingService {
-    sendMessage(message: Message):Promise<any>;
+    sendMessage<TMessage extends Message=Message>(message: TMessage):Promise<any>;
     dispose():void;
 }
 
@@ -27,8 +30,8 @@ export type Message = {
     receiver?: string;
 }
 
-export type MessageTyped<TPayload> = {
-    action: string;
+export type MessageTyped<TAction extends string, TPayload> = Message & {
+    action: TAction;
     targetOrigin?: string;
     sender: string;
     receiver?: string;

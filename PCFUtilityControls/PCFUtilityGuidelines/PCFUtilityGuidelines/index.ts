@@ -1,17 +1,21 @@
 import * as control from './PCFUtilityGuidelines';
+
 /*
+
 window.localStorage.setItem("HotReload#PCFUtilityGuidelines#enabled", "On");
 window.localStorage.setItem("HotReload#PCFUtilityGuidelines#Url", "http://127.0.0.1:8181/bundle.js");
+window.localStorage.setItem("HotReload#PCFUtilityGuidelines#LogLevel", "debug");
 
 window.localStorage.setItem("HotReload#PCFUtilityGuidelines#enabled", "Off");
 window.localStorage.setItem("HotReload#PCFUtilityGuidelines#Url", "");
+window.localStorage.setItem("HotReload#PCFUtilityGuidelines#LogLevel", "warn");
 
 C:\github\FlorianGrimm\PCFUtilities\PCFUtilityControls\PCFUtilityGuidelines\node_modules\pcf-start\bin\pcf-start.js
 // Start server
 var options = {
     port: 8181,
     host: '0.0.0.0',
-	cors: true,
+	cors: true, // add this
 
 npm run start watch	
 
